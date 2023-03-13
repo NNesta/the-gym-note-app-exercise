@@ -1,69 +1,52 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Editor from "./components/Editor";
 import Split from "react-split";
 import { nanoid } from "nanoid";
 
-/**
- * Challenge: Spend 10-20+ minutes reading through the code
- * and trying to understand how it's currently working. Spend
- * as much time as you need to feel confident that you
- * understand the existing code (although you don't need
- * to fully understand everything to move on)
- */
-
-export default function App() {
-  const [notes, setNotes] = React.useState(
+const App = () => {
+  const [notes, setNotes] = useState(
     () => JSON.parse(localStorage.getItem("notes")) || []
   );
-  const [currentNoteId, setCurrentNoteId] = React.useState(
-    (notes[0] && notes[0].id) || ""
+  const [currentNoteId, setCurrentNoteId] = useState(
+    notes[0] ? notes[0].id : ""
   );
 
-  function createNewNote() {
+  const createNewNote = () => {
     const newNote = {
       id: nanoid(),
       body: "# Type your markdown note's title here",
     };
     setNotes((prevNotes) => [newNote, ...prevNotes]);
     setCurrentNoteId(newNote.id);
-  }
-  React.useEffect(() => {
+  };
+  useEffect(() => {
     localStorage.setItem("notes", JSON.stringify(notes));
   }, [notes]);
-  function updateNote(text) {
-    setNotes(
-      (oldNotes) => {
-        const newArray = [];
-        for (let note of oldNotes) {
-          if (note.id === currentNoteId) {
-            newArray.unshift({ ...note, body: text });
-          } else newArray.push(note);
-        }
-        return newArray;
+  const updateNote = (text) => {
+    setNotes((oldNotes) => {
+      const newArray = [];
+      for (let note of oldNotes) {
+        if (note.id === currentNoteId) {
+          newArray.unshift({ ...note, body: text });
+        } else newArray.push(note);
       }
+      return newArray;
+    });
+  };
 
-      //This does not arrange for the current note to be at the top of the list.
-      //   oldNotes.map((oldNote) => {
-      //     return oldNote.id === currentNoteId
-      //       ? { ...oldNote, body: text }
-      //       : oldNote;
-      //   })
-    );
-  }
-
-  function findCurrentNote() {
+  const findCurrentNote = () => {
     return (
       notes.find((note) => {
         return note.id === currentNoteId;
       }) || notes[0]
     );
-  }
-  function deleteNote(noteId) {
+  };
+  const deleteNote = (noteId) => {
     setNotes((prevNotes) => {
       return prevNotes.filter((note) => note.id !== noteId);
     });
-  }
+  };
 
   return (
     <main>
@@ -90,4 +73,5 @@ export default function App() {
       )}
     </main>
   );
-}
+};
+export default App;
